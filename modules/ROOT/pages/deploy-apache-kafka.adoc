@@ -1,11 +1,8 @@
 [[deploy-apache-kafka]]
 == Deploying Apache Kafka Cluster
-
 include::_attributes.adoc[]
-:strimzi-version: v0.16.2
 
-
-As part of the upcoming section of this chapter, we will be deploying a <<eventing-source,Knative Source>>, that will respond to Apache Kafka Topic messages(events). Before getting to other exercies, we need to first deploy Apache Kafka inside in your Kubernetes cluster. 
+As part of the upcoming section of this chapter, we will be deploying a <<eventing-source,Knative Source>>, that will respond to Apache Kafka Topic messages(events). Before getting to other exercises, we need to first deploy Apache Kafka inside in your Kubernetes cluster. 
 
 The https://operatorhub.io/operator/strimzi-kafka-operator[strimzi] Kubernetes https://kubernetes.io/docs/concepts/extend-kubernetes/operator/[operator] can be used to deploy the Apache Kafka Cluster in your Kubernetes cluster. 
 

@@ -1,12 +1,12 @@
 [[kn-eventing-with-kafka]]
-== Knative Eventing with Apache Kafka
+== Apache Kafka Events with Knative Eventing
 include::_attributes.adoc[]
 
 At the end of this chapter you will be able to:
 
-- How to use Knative Eventing Channels with Camel-K
-- Using Knative CamelSource
-- Connect Camel-K source to Sink
+- Using KafkaSource with Knative Eventing
+- Source Kafka Events to Sink
+- Autocaling Knative Services with Apache Kafka Events
 
 
 ifndef::workshop[]
@@ -17,12 +17,488 @@ include::knative-tutorial:ROOT:partial$prereq-cli.adoc[]
 
 endif::[]
 
-[#cleanup]
+include::knative-tutorial-basics:ROOT:partial$eventing-snippets.adoc[tag=eventing-nav-folder]
+
+[#kn-eventing-kafka-source]
+=== Deploy Knative Eventing KafkaSource
+
+Knative Eventing `KafkaSource` need to be used to have the Kafka messages to flow through the Knative Eventing Channels. You can deploy Knative KafkaSource by running the command:
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#kn-eventing-adv-deploy-kafkasource]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+kubectl apply \
+-f https://github.com/knative/eventing-contrib/\
+releases/download/{knative-eventing-version}/kafka-source.yaml
+----
+copyToClipboard::kn-eventing-adv-deploy-kafkasource[]
+--
+oc::
++
+--
+endif::[]
+[NOTE]
+======
+Use the OperatorHub in OpenShift web console to install Knative Eventing Kafka operator that will install the KafkaSource.
+======
+ifndef::workshop[]
+--
+endif::[]
+====
+
+The previous step deploys Knative KafkaSource in the `knative-sources` namespace as well as a CRD, ServiceAccount, ClusterRole, etc.  Verify that knative-source namespace includes the `kafka-controller-manager-0` pod:
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#watch-kafkasource-controller-pod]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+watch kubectl get pods -n knative-sources
+----
+copyToClipboard::watch-kafkasource-controller-pod[]
+--
+oc::
++
+--
+endif::[]
+[#oc-watch-kafkasource-controller-pod]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+watch kubectl get pods -n knative-sources
+----
+copyToClipboard::oc-watch-kafkasource-controller-pod[]
+
+ifndef::workshop[]
+--
+endif::[]
+====
+
+The command above should show the following output:
+
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+NAME                         READY   STATUS    AGE
+kafka-controller-manager-0   1/1     Running   1m17s
+----
+
+You should also deploy the Knative Kafka Channel that can be used to connect the Knative Eventing Channel with a Apache Kafka cluster backend, to deploy a Knative Kafka Channel run:
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#kn-eventing-deploy-kafka-channel]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+curl -L "https://github.com/knative/eventing-contrib/\
+releases/download/]{knative-eventing-version}pass:q[/kafka-channel.yaml" \
+ | sed 's/REPLACE_WITH_CLUSTER_URL/my-cluster-kafka-bootstrap.kafka:9092/' \
+ | kubectl apply --filename -
+----
+copyToClipboard::kn-eventing-deploy-kafka-channel[]
+
+[NOTE]
+=====
+"my-cluster-kafka-bootstrap.kafka:9092" comes from `kubectl get services -n kafka`
+=====
+--
+oc::
++
+--
+endif::[]
+[NOTE]
+======
+Knative Eventing Kafka operator that was done in earlier, will install Knative KafkaChannel as well.
+======
+ifndef::workshop[]
+--
+endif::[]
+====
+
+Look for 3 new pods in namespace `knative-eventing` with the prefix "kafka":
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#kn-eventing-list-kafka-source-pods]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+watch kubectl get pods -n knative-eventing
+----
+copyToClipboard::kn-eventing-list-kafka-source-pods[]
+--
+oc::
++
+--
+endif::[]
+[#kn-eventing-list-kafka-source-pods-oc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+watch oc get pods -n knative-eventing
+----
+copyToClipboard::kn-eventing-list-kafka-source-pods-oc[]
+ifndef::workshop[]
+--
+endif::[]
+====
+
+The command will shown an output like:
+
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+NAME                                   READY   STATUS    AGE
+eventing-controller-666b79d867-kq8cc   1/1     Running   64m
+eventing-webhook-5867c98d9b-hzctw      1/1     Running   64m
+imc-controller-7c4f9945d7-s59xd        1/1     Running   64m
+imc-dispatcher-7b55b86649-nsjm2        1/1     Running   64m
+*kafka-ch-controller-7c596b6b55-fzxcx   1/1     Running   33s
+kafka-ch-dispatcher-577958f994-4f2qs   1/1     Running   33s
+kafka-webhook-74bbd99f5c-c84ls         1/1     Running   33s*
+sources-controller-694f8df9c4-pss2w    1/1     Running   64m
+----
+
+And you should also find some new api-resources as shown:
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#kn-eventing-list-api-res-sources]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+kubectl api-resources --api-group='sources.eventing.knative.dev'
+----
+copyToClipboard::kn-eventing-list-api-res-sources[]
+--
+oc::
++
+--
+endif::[]
+[#kn-eventing-list-api-res-sources-oc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+oc api-resources --api-group='sources.eventing.knative.dev'
+----
+copyToClipboard::kn-eventing-list-api-res-sources-oc[]
+ifndef::workshop[]
+--
+endif::[]
+====
+
+The command should show the following APIs in `sources.eventing.knative.dev` :
+
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+NAME               APIGROUP                       NAMESPACED  KIND
+apiserversources   sources.eventing.knative.dev   true        ApiServerSource
+containersources   sources.eventing.knative.dev   true        ContainerSource
+cronjobsources     sources.eventing.knative.dev   true        CronJobSource
+*kafkasources       sources.eventing.knative.dev   true        KafkaSource*
+sinkbindings       sources.eventing.knative.dev   true        SinkBinding
+----
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#kn-eventing-list-api-res-messaging]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+kubectl api-resources --api-group='messaging.knative.dev'
+----
+copyToClipboard::kn-eventing-list-api-res-messaging[]
+--
+oc::
++
+--
+endif::[]
+[#kn-eventing-list-api-res-messaging-oc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+oc api-resources --api-group='messaging.knative.dev'
+----
+copyToClipboard::kn-eventing-list-api-res-messaging-oc[]
+ifndef::workshop[]
+--
+endif::[]
+====
+
+The command should show the following APIs in `messaging.knative.dev` :
+
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+NAME               SHORTNAMES   APIGROUP                NAMESPACED   KIND
+channels           ch           messaging.knative.dev   true         Channel
+inmemorychannels   imc          messaging.knative.dev   true         InMemoryChannel
+*kafkachannels      kc           messaging.knative.dev   true         KafkaChannel*
+parallels                       messaging.knative.dev   true         Parallel
+sequences                       messaging.knative.dev   true         Sequence
+subscriptions      sub          messaging.knative.dev   true         Subscription
+----
+
+[#kn-eventing-adv-default-knative-channel]
+== Using Kafka Channel as Default Knative Channel
+
+include::partial$default-knative-channel.adoc[leveloffset=+2]
+
+[#kn-eventing-kafka-source-to-sink]
+=== Connecting Kafka Source to Sink 
+
+Now, all of your infrastructure is configured, you can deploy the Knative Serving Service(sink) by running the command:
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+
+[#kn-kafka-src-eventing-hello]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+kubectl apply -n {tutorial-namespace} -f eventing-hello-sink.yaml
+----
+copyToClipboard::kn-kafka-src-eventing-hello[]
+
+Check the Knative Service that was created by the command above:
+
+[#kn-kafka-src-eventing-hello-ksvc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+kubectl get ksvc
+----
+copyToClipboard::kn-kafka-src-eventing-hello-ksvc[]
+
+--
+oc::
++
+--
+endif::[]
+[#kn-kafka-src-eventing-hello-oc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+oc apply -n {tutorial-namespace} -f eventing-hello-sink.yaml
+----
+copyToClipboard::kn-kafka-src-eventing-hello-oc[]
+
+Check the Knative Service that was created by the command above:
+
+[#kn-kafka-src-eventing-hello-ksvc-oc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+oc get ksvc
+----
+copyToClipboard::kn-kafka-src-eventing-hello-ksvc-oc[]
+
+ifndef::workshop[]
+--
+endif::[]
+====
+
+
+The command should show an output like:
+
+[source,bash]
+----
+NAME            URL                                      READY
+eventinghello   http://eventinghello.kafka.example.com   True
+----
+
+Make sure to follow the logs using `stern`:
+
+[#kn-kafka-src-sink-stern]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+stern eventinghello -c user-container
+----
+copyToClipboard::kn-kafka-src-sink-stern[]
+
+The initial deployment of `eventinghello` will cause it to scale up to 1 pod.  It will be around until it hits its scale-down time limit.  Allow it to scale down to zero pods before continuing.
+
+Create a `KafkaSource` for `my-topic` by connecting your Kafka topic `my-topic` to eventinghello:
+
+[source,yaml]
+----
+apiVersion: sources.eventing.knative.dev/v1alpha1
+kind: KafkaSource
+metadata:
+  name: mykafka-source
+spec:
+  consumerGroup: knative-group
+  bootstrapServers: my-cluster-kafka-bootstrap.kafka:9092 #<.>
+  topics: my-topic #<.>
+  sink: #<.>
+    ref:
+      apiVersion: serving.knative.dev/v1alpha1
+      kind: Service
+      name: eventinghello
+----
+
+<.> "my-cluster-kafka-bootstrap:9092" can be found via `kubectl get -n kafka services` or `oc get  -n kafka services`
+<.> `my-topic` was created earlier xref:deploy-apache-kafka.adoc#create-kafka-topic[section] when deploying Apache Kafka
+<.> This is another example of a direct xref:knative-tutorial-basics:ROOT:eventing/eventing-src-to-sink.adoc.adoc#eventing-sink-service[Source to Sink]
+
+The deployment of `KafkaSource` will result in a new pod prefixed with "mykafka-source".
+
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#kn-kafka-source-deploy]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+kubectl -n {tutorial-namespace} apply -f mykafka-source.yaml
+----
+copyToClipboard::kn-kafka-source-deploy[]
+
+[#kn-kafka-source-status-watch]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+watch kubectl get pods
+----
+copyToClipboard::kn-kafka-source-status-watch[]
+--
+oc::
++
+--
+endif::[]
+[#kn-kafka-source-deploy-oc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+oc -n {tutorial-namespace} apply -f mykafka-source.yaml
+----
+copyToClipboard::kn-kafka-source-deploy-oc[]
+
+[#kn-kafka-source-status-watch-oc]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+watch oc get pods
+----
+copyToClipboard::kn-kafka-source-status-watch-oc[]
+ifndef::workshop[]
+--
+endif::[]
+====
+
+When the KafkaSource is ready it will show the following output:
+
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+NAME                                          READY  STATUS   RESTARTS  AGE
+mykafka-source-vxs2k-56548756cc-j7m7v         1/1    Running  0         11s
+----
+
+[WARNING]
+====
+Since we had test messages of "one", "two" and "three" from earlier you might see the eventinghello service awaken to process those messages.
+
+Wait for eventinghello to scale down to zero pods before moving on then push more Kafka messages into my-topic.
+====
+
+[#kn-kakfa-source-producer-events]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+$TUTORIAL_HOME/bin/kafka-producer.sh
+----
+copyToClipboard::kn-kakfa-source-producer-events[]
+
+And then enter the following JSON-formatted messages:
+
+[source,json]
+----
+{"hello":"world"}
+
+{"hola":"mundo"}
+
+{"bonjour":"le monde"}
+
+{"hey": "duniya"}
+----
+
+[NOTE]
+====
+Knative Eventing events through the Kafka Source must be JSON formatted
+====
+
+While making sure to monitor the logs of the `eventinghello` pod:
+
+[#stern-kafka-src-events]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+stern eventinghello -c user-container
+----
+copyToClipboard::stern-kafka-src-events[]
+
+[source,bash,subs="attributes+,+macros"]
+----
+ce-id=partition:1/offset:1
+ce-source=/apis/v1/namespaces/kafka/kafkasources/mykafka-source#my-topic
+ce-specversion=1.0
+ce-time=2020-01-01T01:16:12.886Z
+ce-type=dev.knative.kafka.event
+content-type=application/json
+content-length=17
+POST:{"hey": "duniya"}
+----
+
+[NOTE]
+====
+The sample output has been modified for readability and formatting reasons. You can see the logging output of all your JSON-based event input in the terminal where you are watching the eventinghello logs.
+====
+
+[#kn-kafka-src-cleanup]
 === Cleanup
 
-[#kn-eventing-kafka-cleanup]
+ifndef::workshop[]
+[tabs]
+====
+kubectl::
++
+--
+[#kn-eventing-kafka-src-cleanup]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
-kamel delete echoer
+kubectl delete -n {tutorial-namespace}  -f mykafka-source.yaml
+kubectl delete -n {tutorial-namespace}  -f eventing-hello-sink.yaml
+kubectl delete -n kafka -f kafka-topic-my-topic.yaml
 ----
-copyToClipboard::kn-eventing-kafka-cleanup[]
+copyToClipboard::kn-eventing-kafka-src-cleanup[]
+--
+oc::
++
+--
+endif::[]
+[#kn-eventing-kafka-src-cleanup-oc]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+oc delete -n {tutorial-namespace}  -f mykafka-source.yaml
+oc delete -n {tutorial-namespace}  -f eventing-hello-sink.yaml
+oc delete -n kafka -f kafka-topic-my-topic.yaml
+----
+copyToClipboard::kn-eventing-kafka-src-cleanup-oc[]
+ifndef::workshop[]
+--
+endif::[]
+====
+

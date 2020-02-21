@@ -1,6 +1,12 @@
 * Knative Eventing
-** xref:eventing/deploy-apache-kafka.adoc[Deploy Apache Kafka]
-** xref:eventing/default-knative-channel.adoc[Default Knative Channel]
+** xref:deploy-apache-kafka.adoc[Deploy Apache Kafka]
+*** xref:deploy-apache-kafka.adoc#create-kafka-topic[Create Topic]
+*** xref:deploy-apache-kafka.adoc#kafka-producer[Run Producer]
+*** xref:deploy-apache-kafka.adoc#kafka-consumer[Run Consumer]
 ** xref:eventing-with-kafka.adoc[Knative Eventing with Apache Kafka]
+*** xref:eventing-with-kafka.adoc#kn-eventing-kafka-source[Deploy KafkaSource]
+*** xref:eventing-with-kafka.adoc#kn-eventing-adv-default-knative-channel[Kafka Knative Channel]
+*** xref:eventing-with-kafka.adoc#kn-eventing-kafka-source-to-sink[Kafka Source to Sink]
+** xref:eventing-with-kafka.adoc#kn-kafka-src-cleanup[Cleanup]
 * Apache Camel-K
 ** xref:camel-k-cbr.adoc[Content Based Routing with Camel-K]
