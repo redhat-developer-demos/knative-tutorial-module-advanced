@@ -1,0 +1,28 @@
+[[kn-eventing-with-kafka]]
+== Knative Eventing with Apache Kafka
+include::_attributes.adoc[]
+
+At the end of this chapter you will be able to:
+
+- How to use Knative Eventing Channels with Camel-K
+- Using Knative CamelSource
+- Connect Camel-K source to Sink
+
+
+ifndef::workshop[]
+[#kn-eventing-kafka-cleanup-prerequisite]
+== Prerequisite
+
+include::knative-tutorial:ROOT:partial$prereq-cli.adoc[]
+
+endif::[]
+
+[#cleanup]
+=== Cleanup
+
+[#kn-eventing-kafka-cleanup]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+kamel delete echoer
+----
+copyToClipboard::kn-eventing-kafka-cleanup[]

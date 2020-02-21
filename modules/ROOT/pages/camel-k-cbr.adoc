@@ -1,0 +1,44 @@
+[[camel-k-cbr]]
+== Camel-K:: Applying Content Based Routing EIP
+include::_attributes.adoc[]
+
+At the end of this chapter you will be able to:
+
+- How to run integrate Apache Kafka and Camel-K
+- Apply Content Based Routing (CBR) Enterprise Integration Pattern(EIP)
+
+Apache Camel supports numerous Enterprise Integration Patterns (EIPs) out-of-the-box, you can find the complete list of patterns on the Apache Camel https://camel.apache.org/manual/latest/enterprise-integration-patterns.html[website].
+
+[sidebar]
+.Content Based Router
+****
+The Content Based Router examines the message content and routes the message to a different channel based on the data contained in the message. The routing can be based on a number of criteria such as existence of fields, specific field values etc. When implementing a Content Based Router, special caution should be taken to make the routing function easy to maintain as the router can become a point of frequent maintenance. In more sophisticated integration scenarios, the Content Based Router can take on the form of a configurable rules engine that computes the destination channel based on a set of configurable rules. footnote:[https://www.enterpriseintegrationpatterns.com/patterns/messaging/ContentBasedRouter.html]
+****
+
+ifndef::workshop[]
+[#camelk-cbr-prerequisite]
+== Prerequisite
+
+include::knative-tutorial:ROOT:partial$prereq-cli.adoc[]
+
+endif::[]
+
+Navigate to the tutorial chapter's folder {camelk-repo}:
+
+[#camelk-repo-nav-folder]
+[source,bash,subs="+macros,+attributes"]
+----
+cd $TUTORIAL_HOME/{camelk-repo}
+----
+copyToClipboard::camelk-repo-nav-folder[]
+
+
+[#cleanup]
+=== Cleanup
+
+[#camelk-cbr-cleanup]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+kamel delete echoer
+----
+copyToClipboard::camelk-cbr-cleanup[]

@@ -1,0 +1,16 @@
+:moduledir: ..
+:branch: master
+:github-repo: https://github.com/redhat-developer-demos/knative-tutorial/blob/{branch}
+:advanced-module-github-repo-uri: https://github.com/redhat-developer-demos/knative-tutorial-advanced
+:advanced-github-repo-uri: https://github.com/redhat-developer-demos/knative-tutorial-advanced
+:advanced-github-repo: {advanced-module-github-repo-uri}/blob/{branch}
+:camelk-repo: advanced/camel-k
+:eventing-repo:eventing
+:observability-repo: advanced/observability
+:kamel-version: 1.0.0-RC2
+:experimental:
+:maven-version: 3.6.0+
+:camel-source-version: 
+:knative-version: v0.12.0
+:camel-source-version: v0.12.2
+:knative-eventing-version: v0.12.2

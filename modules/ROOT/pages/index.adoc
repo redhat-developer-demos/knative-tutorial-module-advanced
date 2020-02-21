@@ -1,0 +1,11 @@
+= Knative Tutorial Advanced
+include::_attributes.adoc[]
+
+This tutorial helps in undertanding some advanced concepts and application with Knative Serving, Eventing and Apache Camel-k
+
+[#camelk-tutorial-prerequisite]
+== Prerequisite 
+As pre-requisite to this tutorial, its highly recommended that you have completed: 
+* xref:knative-tutorial:ROOT:index.adoc[Knative Tutorial Basics]
+* xref:knative-tutorial-camel-k:ROOT:index.adoc[Integrations with Apache Camel-K]
+

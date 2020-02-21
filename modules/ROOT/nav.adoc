@@ -1,0 +1,6 @@
+* Knative Eventing
+** xref:eventing/deploy-apache-kafka.adoc[Deploy Apache Kafka]
+** xref:eventing/default-knative-channel.adoc[Default Knative Channel]
+** xref:eventing-with-kafka.adoc[Knative Eventing with Apache Kafka]
+* Apache Camel-K
+** xref:camel-k-cbr.adoc[Content Based Routing with Camel-K]
