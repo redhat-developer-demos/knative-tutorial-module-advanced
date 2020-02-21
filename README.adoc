@@ -1,1 +1,1 @@
-Camel-k module sources for Knative tutorial.
+Advanced Topics module for Knative Tutorial
