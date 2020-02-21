@@ -8,5 +8,13 @@
 *** xref:eventing-with-kafka.adoc#kn-eventing-adv-default-knative-channel[Kafka Knative Channel]
 *** xref:eventing-with-kafka.adoc#kn-eventing-kafka-source-to-sink[Kafka Source to Sink]
 ** xref:eventing-with-kafka.adoc#kn-kafka-src-cleanup[Cleanup]
-* Apache Camel-K
-** xref:camel-k-cbr.adoc[Content Based Routing with Camel-K]
+*  EIP with Apache Camel-K
+** xref:camel-k-cbr.adoc[Content Based Routing]
+*** xref:camel-k-cbr.adoc#cbr-app-overview[Application Overview]
+*** xref:camel-k-cbr.adoc#label-namespace-for-default-broker[Label Namespace]
+*** xref:camel-k-cbr.adoc#camel-k-cbr-data-producer[Deploy Data Producer]
+*** xref:camel-k-cbr.adoc#camel-k-cbr-data-processor[Deploy Data Processor]
+*** xref:camel-k-cbr.adoc#camel-k-cbr-event-subscriber[Deploy Event Subscriber]
+*** xref:camel-k-cbr.adoc#camel-k-cbr-event-filter[Apply Knative Filter]
+*** xref:camel-k-cbr.adoc#verify-e2e[Verify End to End]
+*** xref:camel-k-cbr.adoc#kamel-cbr-cleanup[Cleanup]
