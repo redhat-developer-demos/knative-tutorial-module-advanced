@@ -17,7 +17,7 @@ include::knative-tutorial:ROOT:partial$prereq-cli.adoc[]
 
 endif::[]
 
-include::knative-tutorial-basics:ROOT:partial$eventing-snippets.adoc[tag=eventing-nav-folder]
+include::knative-tutorial-eventing:ROOT:partial$eventing-snippets.adoc[tag=eventing-nav-folder]
 
 [#kn-eventing-kafka-source]
 === Deploy Knative Eventing KafkaSource
