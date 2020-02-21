@@ -355,7 +355,7 @@ spec:
 
 <.> "my-cluster-kafka-bootstrap:9092" can be found via `kubectl get -n kafka services` or `oc get  -n kafka services`
 <.> `my-topic` was created earlier xref:deploy-apache-kafka.adoc#create-kafka-topic[section] when deploying Apache Kafka
-<.> This is another example of a direct xref:knative-tutorial-basics:ROOT:eventing/eventing-src-to-sink.adoc.adoc#eventing-sink-service[Source to Sink]
+<.> This is another example of a direct xref:knative-tutorial-eventing:ROOT:eventing-src-to-sink.adoc.adoc#eventing-sink-service[Source to Sink]
 
 The deployment of `KafkaSource` will result in a new pod prefixed with "mykafka-source".
 
