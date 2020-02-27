@@ -197,7 +197,7 @@ Now that you have an Apache Kafka cluster deployed, you can create a Kafka Topic
 .Create Kafka Topic my-topic
 [source,yaml]
 ----
-apiVersion: kafka.strimzi.io/v1alpha1
+apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaTopic
 metadata:
   name: my-topic
