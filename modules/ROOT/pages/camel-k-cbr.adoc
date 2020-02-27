@@ -1,3 +1,5 @@
+= {title}
+
 [[camel-k-cbr]]
 == Applying Content Based Routing EIP
 include::_attributes.adoc[]
