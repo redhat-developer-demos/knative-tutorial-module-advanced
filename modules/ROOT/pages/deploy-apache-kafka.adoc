@@ -6,6 +6,8 @@ As part of the upcoming section of this chapter, we will be deploying a <<eventi
 
 The https://operatorhub.io/operator/strimzi-kafka-operator[strimzi] Kubernetes https://kubernetes.io/docs/concepts/extend-kubernetes/operator/[operator] can be used to deploy the Apache Kafka Cluster in your Kubernetes cluster. 
 
+include::knative-tutorial-eventing:ROOT:partial$eventing-snippets.adoc[tag=eventing-nav-folder]
+
 Run the following command to create the `kafka` namespace and deploy Apache Kafka into it:
 
 ifndef::workshop[]
@@ -21,7 +23,7 @@ kubectl create namespace kafka &&\
 curl -L \
 https://github.com/strimzi/strimzi-kafka-operator\
 /releases/download/{strimzi-version}/strimzi-cluster-operator-{strimzi-version}.yaml \
-  | sed 's/namespace: .*/namespace: kafka/' \
+  | sed 's/namespace:.*/namespace: kafka/' \
   | kubectl apply -n kafka -f -
 ----
 copyToClipboard::eventing-deploy-kafka[]
@@ -299,7 +301,7 @@ You should also leverage the sample code repository's `kafka-consumer.sh` script
 [#run-kafka-consumer]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
-$ *$TUTORIAL_HOME/bin/kafka-consumer.sh*
+$TUTORIAL_HOME/bin/kafka-consumer.sh
 ----
 copyToClipboard::run-kafka-consumer[]
 

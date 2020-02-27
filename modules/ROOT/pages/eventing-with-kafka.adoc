@@ -103,7 +103,7 @@ kubectl::
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 curl -L "https://github.com/knative/eventing-contrib/\
-releases/download/]{knative-eventing-version}pass:q[/kafka-channel.yaml" \
+releases/download/{knative-eventing-version}/kafka-channel.yaml" \
  | sed 's/REPLACE_WITH_CLUSTER_URL/my-cluster-kafka-bootstrap.kafka:9092/' \
  | kubectl apply --filename -
 ----
