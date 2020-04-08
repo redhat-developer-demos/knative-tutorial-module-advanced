@@ -5,7 +5,7 @@ By default all Knative Channels created by the Knative Eventing API use InMemory
 We installed xref:knative-tutorial-adv:ROOT:deploy-apache-kafka.adoc[Apache Kafka], earlier in this tutorial, let us now configure it to be the default Knative Channel backend:
 
 .Knative Default Channel ConfigMap
-[source,yaml]
+[source,yaml,subs="attributes"]
 ----
 apiVersion: v1
 kind: ConfigMap
@@ -18,7 +18,7 @@ data:
       apiVersion: messaging.knative.dev/v1alpha1
       kind: InMemoryChannel
     namespaceDefaults: #<2>
-      chapter-4:
+      {tutorial-namespace}:
         apiVersion: messaging.knative.dev/v1alpha1
         kind: KafkaChannel
         spec:
@@ -41,7 +41,7 @@ copyToClipboard::eventing-default-channel-create[]
 Since you have now made all Knative Eventing Channels of *{tutorial-namespace}* to be KafkaChannel, creating a Knative Eventing Channel in namespace *{tutorial-namespace}* will result in a corresponding Kafka Topic created. Let us now verify it by creating a sample Channel as show in listing,
 
 .Create a example Channel
-[source,yaml]
+[source,yaml,subs="+attributes"]
 ----
 cat <<EOF | kubectl apply -f - 
 apiVersion: messaging.knative.dev/v1alpha1
