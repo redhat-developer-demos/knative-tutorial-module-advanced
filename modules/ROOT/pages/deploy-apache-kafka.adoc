@@ -8,80 +8,45 @@ As part of the upcoming section of this chapter, we will be deploying a <<eventi
 
 The https://operatorhub.io/operator/strimzi-kafka-operator[strimzi] Kubernetes https://kubernetes.io/docs/concepts/extend-kubernetes/operator/[operator] can be used to deploy the Apache Kafka Cluster in your Kubernetes cluster. 
 
-include::knative-tutorial-eventing:ROOT:partial$eventing-snippets.adoc[tag=eventing-nav-folder]
-
-Run the following command to create the `kafka` namespace and deploy Apache Kafka into it:
-
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
-[#eventing-deploy-kafka]
+[.console-input]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
-kubectl create namespace kafka &&\
+cd $TUTORIAL_HOME/eventing
+----
+
+Run the following command to create the `kafka` namespace 
+
+[.console-input]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+kubectl create namespace kafka
+----
+
+Deploy Apache Kafka into `kafka` namespace:
+
+[#eventing-deploy-kafka]
+[.console-input]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
 curl -L \
 https://github.com/strimzi/strimzi-kafka-operator\
 /releases/download/{strimzi-version}/strimzi-cluster-operator-{strimzi-version}.yaml \
   | sed 's/namespace:.*/namespace: kafka/' \
   | kubectl apply -n kafka -f -
 ----
-copyToClipboard::eventing-deploy-kafka[]
---
-oc::
-+
---
-endif::[]\
-[#oc-eventing-deploy-kafka]
-[source,bash,subs="+quotes,attributes+,+macros"]
-----
-oc create namespace kafka &&\
-curl -L \
-https://github.com/strimzi/strimzi-kafka-operator\
-/releases/download/{strimzi-version}/strimzi-cluster-operator-{strimzi-version}.yaml \
-  | sed 's/namespace: .*/namespace: kafka/' \
-  | oc apply -n kafka -f - 
-----
-copyToClipboard::oc-eventing-deploy-kafka[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 Wait for the strimzi-cluster-operator to be running:
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
 [#eventing-watch-kafka-pods]
+[.console-input]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
-watch kubectl get pods -n kafka
+watch "kubectl get pods -n kafka"
 ----
-copyToClipboard::eventing-watch-kafka-pods[]
---
-oc::
-+
---
-endif::[]
-[#oc-eventing-watch-kafka-pods]
-[source,bash,subs="+quotes,attributes+,+macros"]
-----
-watch oc get pods -n kafka
-----
-copyToClipboard::oc-eventing-watch-kafka-pods[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 The command should show the following output:
 
+[.console-output]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 NAME                                        READY STATUS    AGE
@@ -90,97 +55,51 @@ strimzi-cluster-operator-85f596bfc7-7dgds   1/1   Running   1m2s
 
 The strimzi operator would have installed several Apache Kafka related CRDs which can be used to create Apache Kafka core resources such as a topic, users, connectors etc., you can verify the CRDs that are available by querying `api-resources`:
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#eventing-watch-kafka-res]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 kubectl api-resources --api-group='kafka.strimzi.io'
 ----
-copyToClipboard::eventing-watch-kafka-res[]
---
-oc::
-+
---
-endif::[]
-[#oc-eventing-watch-kafka-res]
-[source,bash,subs="+quotes,attributes+,+macros"]
-----
-oc api-resources --api-group='kafka.strimzi.io'
-----
-copyToClipboard::oc-eventing-watch-kafka-res[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 The command should show the following output:
 
+[.console-output]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
-kafkabridges.kafka.strimzi.io                        2019-12-28T14:53:14Z
-kafkaconnects.kafka.strimzi.io                       2019-12-28T14:53:14Z
-kafkaconnects2is.kafka.strimzi.io                    2019-12-28T14:53:14Z
-kafkamirrormakers.kafka.strimzi.io                   2019-12-28T14:53:14Z
-kafkas.kafka.strimzi.io                              2019-12-28T14:53:14Z
-kafkatopics.kafka.strimzi.io                         2019-12-28T14:53:14Z
-kafkausers.kafka.strimzi.io                          2019-12-28T14:53:14Z
+NAME                 SHORTNAMES   APIGROUP           NAMESPACED   KIND
+kafkabridges         kb           kafka.strimzi.io   true         KafkaBridge
+kafkaconnectors      kctr         kafka.strimzi.io   true         KafkaConnector
+kafkaconnects        kc           kafka.strimzi.io   true         KafkaConnect
+kafkaconnects2is     kcs2i        kafka.strimzi.io   true         KafkaConnectS2I
+kafkamirrormaker2s   kmm2         kafka.strimzi.io   true         KafkaMirrorMaker2
+kafkamirrormakers    kmm          kafka.strimzi.io   true         KafkaMirrorMaker
+kafkas               k            kafka.strimzi.io   true         Kafka
+kafkatopics          kt           kafka.strimzi.io   true         KafkaTopic
+kafkausers           ku           kafka.strimzi.io   true         KafkaUser
 ----
 
 Now with the Apache Kafka operator running, you can deploy and verify a single node Apache Kakfa cluster by running the command:
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#create-kafka-cluster]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 kubectl -n kafka apply -f kafka-broker-my-cluster.yaml
 ----
-copyToClipboard::create-kafka-cluster[]
 
 Watch the Kafka cluster deployment:
 
+[.console-input]
 [#watch-kafka-cluster]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
-watch kubectl get pods -n kafka
+watch "kubectl get pods -n kafka"
 ----
-copyToClipboard::watch-kafka-cluster[]
---
-oc::
-+
---
-endif::[]
-[#oc-create-kafka-cluster]
-[source,bash,subs="+quotes,attributes+,+macros"]
-----
-oc -n kafka apply -f kafka-broker-my-cluster.yaml
-----
-copyToClipboard::oc-create-kafka-cluster[]
-
-Watch the Kafka cluster deployment:
-
-[#oc-watch-kafka-cluster]
-[source,bash,subs="+quotes,attributes+,+macros"]
-----
-oc kubectl get pods -n kafka
-----
-copyToClipboard::oc-watch-kafka-cluster[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 Watch the `kafka` namespace for the cluster deployment:
 
+[.console-output]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 NAME                                         READY  STATUS   AGE
@@ -218,56 +137,25 @@ You can choose to skip the manual pre-creation of a KafkaTopic but the automatic
 [[create-kafka-topic]]
 === Create Kafka Topic
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
-
-[#create-kakfa-topic]
-[source,bash,subs="+quotes,attributes+,+macros"]
-----
-kubectl -n kafka create -f kafka-topic-my-topic.yaml
-----
-copyToClipboard::create-kakfa-topic[]
-
-Verify the created topic:
-
-[#verify-create-kakfa-topic]
-[source,bash,subs="+quotes,attributes+,+macros"]
-----
-kubectl -n kafka  get kafkatopics
-----
-copyToClipboard::verify-create-kakfa-topic[]
---
-oc::
-+
---
-endif::[]
-
+[.console-input]
 [#oc-create-kakfa-topic]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 kubectl -n kafka create -f kafka-topic-my-topic.yaml
 ----
-copyToClipboard::oc-create-kakfa-topic[]
 
 Verify the created topic:
 
+[.console-input]
 [#oc-verify-create-kakfa-topic]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 kubectl -n kafka  get kafkatopics
 ----
-copyToClipboard::oc-verify-create-kakfa-topic[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 The verify command should show the following output:
 
+[.console-output]
 [source,bash]
 ----
 NAME       PARTITIONS   REPLICATION FACTOR
@@ -279,15 +167,16 @@ Verify that your Kafka Topic is working correctly by connecting a simple produce
 [[kafka-producer]]
 === Producer
 
+[.console-input]
 [#run-kafka-producer]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 $TUTORIAL_HOME/bin/kafka-producer.sh
 ----
-copyToClipboard::run-kafka-producer[]
 
 On the terminal prompt try entering texts like:
 
+[.console-output]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 >one
@@ -300,15 +189,16 @@ On the terminal prompt try entering texts like:
 
 You should also leverage the sample code repository's `kafka-consumer.sh` script to see the message flow through the topic, open a new terminal and run:
 
+[.console-input]
 [#run-kafka-consumer]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 $TUTORIAL_HOME/bin/kafka-consumer.sh
 ----
-copyToClipboard::run-kafka-consumer[]
 
 On the consumer terminal prompt you will receive texts like:
 
+[.console-output]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 >one
