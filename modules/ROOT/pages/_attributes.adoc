@@ -9,8 +9,9 @@
 :maven-version: 3.6.3+
 :camel-source-version: 
 :knative-version: v0.14.0
-:camel-source-version: v0.14.0
+:camel-source-version: v0.14.1
 :knative-eventing-version: v0.14.0
+:kafka-source-version: v0.14.1
 :strimzi-version: 0.17.0
 :camelk-repo: advanced/camel-k
 :eventing-repo: eventing

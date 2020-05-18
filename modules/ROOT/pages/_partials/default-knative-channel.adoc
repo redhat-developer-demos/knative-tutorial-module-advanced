@@ -31,12 +31,13 @@ data:
 
 Run the following command apply the Knative Eventing Channel configuration:
 
+[.console-input]
 [#eventing-default-channel-create]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 kubectl apply -f default-kafka-channel.yaml
 ----
-copyToClipboard::eventing-default-channel-create[]
+
 
 Since you have now made all Knative Eventing Channels of *{tutorial-namespace}* to be KafkaChannel, creating a Knative Eventing Channel in namespace *{tutorial-namespace}* will result in a corresponding Kafka Topic created. Let us now verify it by creating a sample Channel as show in listing,
 
@@ -55,43 +56,29 @@ EOF
 
 When you now list the topics that are available in Kafka using the script `$TUTORIAL_HOME/bin/kafka-list-topics.sh`, you should see a topic corresponding to your Channel `my-events-ch`:
 
+[.console-input]
 [#list-kn-eventing-channel-topics]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
 $TUTORIAL_HOME/bin/kafka-list-topics.sh
 ----
-copyToClipboard::list-kn-eventing-channel-topics[]
 
-The command should return an output like `knative-messaging-kafka.{tutorial-namespace}.my-events-ch`.
+The command should return an output like:
+
+[.console-output]
+[#list-kn-eventing-channel-topics]
+[source,bash,subs="+quotes,attributes+,+macros"]
+----
+knative-messaging-kafka.{tutorial-namespace}.my-events-ch
+----
 
 For each Knative Eventing Channel that you will create, there will be a Kafka Topic created, the topic's name will follow a convention like `knative-messaging-kafka.<your-channel-namespace>.<your-channel-name>`.
 
 We can delete the example `my-events-ch` channel using the command:
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#eventing-default-channel-cleanup2]
 [source,bash,subs="attributes+,+macros",linenums]
 ----
-kubectl -n {tutorial-namespace} delete -f channels.messaging.knative.dev my-events-ch
+kubectl -n {tutorial-namespace} delete  channels.messaging.knative.dev my-events-ch
 ----
-copyToClipboard::eventing-default-channel-cleanup2[]
-
---
-oc::
-+
---
-endif::[]
-[#eventing-default-channel-cleanup-oc]
-[source,bash,subs="attributes+,+macros",linenums]
-----
-kubectl -n {tutorial-namespace} delete -f channels.messaging.knative.dev my-events-ch
-----
-copyToClipboard::eventing-default-channel-cleanup-oc[]
-ifndef::workshop[]
---
-====
