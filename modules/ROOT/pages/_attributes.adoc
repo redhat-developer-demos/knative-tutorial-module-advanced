@@ -6,12 +6,13 @@
 :advanced-github-repo: {advanced-module-github-repo-uri}/blob/{branch}
 :kamel-version: 1.0.0-RC2
 :experimental:
-:maven-version: 3.6.0+
+:maven-version: 3.6.3+
 :camel-source-version: 
-:knative-version: v0.12.0
-:camel-source-version: v0.12.2
-:knative-eventing-version: v0.12.2
-:strimzi-version: v0.16.2
+:knative-version: v0.14.0
+:camel-source-version: v0.14.1
+:knative-eventing-version: v0.14.0
+:kafka-source-version: v0.14.1
+:strimzi-version: 0.17.0
 :camelk-repo: advanced/camel-k
 :eventing-repo: eventing
 :observability-repo: advanced/observability

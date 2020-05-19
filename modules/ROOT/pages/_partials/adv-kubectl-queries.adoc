@@ -1,59 +1,15 @@
 #tag::kgpow[]
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
-[#{doc-sec}-kamel-cbr-watch-pods]
+[.console-input]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 watch kubectl -n {tutorial-namespace} get 
 ----
-copyToClipboard::{doc-sec}-kamel-cbr-watch-pods[]
---
-oc::
-+
---
-endif::[]
-[#{doc-sec}-kamel-cbr-watch-pods-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-watch oc -n {tutorial-namespace} get pods
-----
-copyToClipboard::{doc-sec}-kamel-cbr-watch-pods-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 #end::kgpow[]
 
 #tag::kgksvc[]
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
-[#{doc-sec}-kamel-cbr-get-ksvc]
+[.console-input]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 kubectl -n {tutorial-namespace} get ksvc
 ----
-copyToClipboard::{doc-sec}-kamel-cbr-get-ksvc[]
---
-oc::
-+
---
-endif::[]
-[#{doc-sec}-kamel-cbr-get-ksvc-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-oc -n {tutorial-namespace} get ksvc
-----
-copyToClipboard::{doc-sec}-kamel-cbr-get-ksvc-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 #end::kgksvc[]
