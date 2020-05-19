@@ -34,14 +34,6 @@ The application has following components,
 
 The upcoming recipes will deploy these individual components and finally we test the integration by wiring them all together.
 
-ifndef::workshop[]
-[#camelk-cbr-prerequisite]
-== Prerequisite
-
-include::knative-tutorial:ROOT:partial$prereq-cli.adoc[]
-
-endif::[]
-
 Just make sure:
 
 * Review xref:eventing/eventing.adoc[Knative Eventing] module to refresh the concepts
@@ -49,76 +41,35 @@ Just make sure:
 
 Finally navigate to the tutorial chapter's folder {camelk-repo}:
 
+[.console-input]
 [#camelk-repo-nav-folder]
 [source,bash,subs="+macros,+attributes"]
 ----
 cd $TUTORIAL_HOME/{camelk-repo}
 ----
-copyToClipboard::camelk-repo-nav-folder[]
 
 [#label-namespace-for-default-broker]
 === Label Namespace 
 
 * The {tutorial-namespace} namespace is labeled to inject Knative Eventing's default Broker filter and ingress deployment.
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#run-label-namespace]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 kubectl label namespace {tutorial-namespace} knative-eventing-injection=enabled
 ----
-copyToClipboard::run-label-namespace[]
---
-oc::
-+
---
-endif::[]
-[#run-label-namespace-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-oc label namespace {tutorial-namespace} knative-eventing-injection=enabled
-----
-copyToClipboard::run-label-namespace-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 If the label is set correctly on the {tutorial-namespace} namespace then you should see the following pods corresponding to Knative Eventing's default broker's filter and ingress:
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#watch-default-broker-pods]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 watch kubectl get pods -n {tutorial-namespace}
 ----
-copyToClipboard::watch-default-broker-pods[]
---
-oc::
-+
---
-endif::[]
-[#watch-default-broker-pods-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-watch oc get pods -n {tutorial-namespace}
-----
-copyToClipboard::watch-default-broker-pods-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 
+[.console-output]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 NAME                                       READY   STATUS      AGE
@@ -157,6 +108,7 @@ Knative Camel-K integration called `fruits-producer` which will use a public htt
 
 Run the following command to deploy the `fruit-producer` integration:
 
+[.console-input]
 [#kamel-cbr-deploy-fruit-producer]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
@@ -167,7 +119,6 @@ kamel -n {tutorial-namespace} run \
  --dependency camel:jsonpath \
  eip/fruits-producer.yaml
 ----
-copyToClipboard::kamel-cbr-deploy-fruit-producer[]
 
 [NOTE]
 ====
@@ -184,6 +135,7 @@ include::partial$adv-kubectl-queries.adoc[tags="kgpow"]
 A successful deploy will show the following pods:
 
 .fruits-producer service pods
+[.console-output]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 NAME                                                READY   STATUS    AGE
@@ -197,6 +149,7 @@ default-broker-ingress-857698bc5b-r4zmf             1/1     Running   5m
 include::partial$adv-kubectl-queries.adoc[tags="kgksvc"]
 
 .fruit-producer Knative services
+[.console-output]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 NAME              URL                                            READY
@@ -209,24 +162,25 @@ fruits-producer   http://fruits-producer.{tutorial-namespace}.example.com   True
 
 Run the `$TUTORIAL_HOME/bin/call.sh` with the parameter `fruits-producer`. 
 
+[.console-input]
 [#kamel-cbr-call-fp]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 $TUTORIAL_HOME/bin/call.sh fruits-producer ''
 ----
-copyToClipboard::kamel-cbr-call-fp[]
 
 Open a new terminal and run the start Kafka consumer using the script `$TUTORIAL_HOME/bin/kafka-consumer.sh` with parameter `fruits`:
 
+[.console-input]
 [#kamel-cbr-kafka-consumer]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 $TUTORIAL_HOME/bin/kafka-consumer.sh fruits
 ----
-copyToClipboard::kamel-cbr-kafka-consumer[]
 
 If the `fruit-producer` executed well then you should the Kafka Consumer terminal show something like:
 
+[.console-output]
 [source,json]
 ----
 {"genus":"Citrullus","name":"Watermelon","id":25,"family":"Cucurbitaceae","order":"Cucurbitales","nutritions":{"carbohydrates":8,"protein":0.6,"fat":0.2,"calories":30,"sugar":6}}
@@ -316,39 +270,18 @@ spec:
 <4> Based on the data classification you will be setting the https://cloudevents.io[CloudEvents] `type` header to be `low-high`, `medium-sugar` and `high-sugar`. This header is used as one of the filter attributes in the Knative Eventing Trigger.
 <5> The last step is to send the processed data to the Knative Eventing Broker named `default`.
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#kamel-deploy-data-processor]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 kubectl apply -n {tutorial-namespace} -f eip/fruits-processor.yaml
 ----
-copyToClipboard::kamel-deploy-data-processor[]
---
-oc::
-+
---
-endif::[]
-[#kamel-deploy-data-processor-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-oc apply -n {tutorial-namespace} -f eip/fruits-processor.yaml
-----
-copyToClipboard::kamel-deploy-data-processor-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 As the Camel-K controller takes few minutes to deploy the CamelSource, you can watch the pods of the `{tutorial-namespace}` namespace for its status:
 
-:doc-sec: dproc
 include::partial$adv-kubectl-queries.adoc[tags="kgpow"]
 
+[.console-output]
 .fruit-processor Knative service pods
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
@@ -368,36 +301,16 @@ Wondering why `fruit-producer` is not listed ?
 `fruit-producer` is a Knative service, hence it wil be scaled down to zero in 60-90 seconds.
 ====
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#kamel-cbr-query-camelsources]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 watch kubectl get  -n {tutorial-namespace} camelsources
 ----
-copyToClipboard::kamel-cbr-query-camelsources[]
---
-oc::
-+
---
-endif::[]
-[#kamel-cbr-query-camelsources-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-watch oc get  -n {tutorial-namespace} camelsources
-----
-copyToClipboard::kamel-cbr-query-camelsources-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 When the CamelSource deployment is successful you will see it in `READY` state as shown:
 
+[.console-output]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 NAME               READY   REASON   AGE
@@ -411,44 +324,22 @@ Let us now deploy a https://en.wikipedia.org/wiki/Reactive_programming[Reactive]
 
 You can deploy the `fruit-events-display` application using the command:
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#kamel-cbr-deploy-event-sub]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 kubectl apply -n {tutorial-namespace} \
   -f $TUTORIAL_HOME/install/utils/fruit-events-display.yaml
 ----
-copyToClipboard::kamel-cbr-deploy-event-sub[]
---
-oc::
-+
---
-endif::[]
-[#kamel-cbr-deploy-event-sub-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-oc apply -n {tutorial-namespace} \
-  -f $TUTORIAL_HOME/install/utils/fruit-events-display.yaml
-----
-copyToClipboard::kamel-cbr-deploy-event-sub-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 Verify if the `fruit-events-display` application is up and running:
 
-:doc-sec: desub
 include::partial$adv-kubectl-queries.adoc[tags="kgpow"]
 
 Once the `fruit-events-display` is running you will see the following pods in the `{tutorial-namespace}`:
 
 .Pods list
+[.console-output]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 NAME                                       READY   STATUS    AGE
@@ -461,43 +352,37 @@ fruits-processor-h45f7-6fdfd74cf9-nmfkn    1/1     Running   4m12s
 
 The web `fruit-events-display` application will refresh its UI as and when it receives the processed data, you need you open the web application in your browser.
 
-ifndef::workshop[]
 [tabs]
 ====
 Minikube::
 +
 --
+[.console-input]
 [#kamel-open-fruit-ui]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 minikube -n {tutorial-namespace} service fruit-events-display
 ----
-copyToClipboard::kamel-open-fruit-ui[]
 --
 OpenShift::
 +
 --
-endif::[]
-
+[.console-input]
 [#kamel-open-fruit-expose]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 oc expose -n {tutorial-namespace} service fruit-events-display
 ----
-copyToClipboard::kamel-open-fruit-expose[]
 
 Once you have exposed the service, you can open the OpenShift route in the web browser:
 
 [#kamel-open-fruit-rt]
+[.console-input]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 oc get -n {tutorial-namespace} route fruit-events-display
 ----
-copyToClipboard::kamel-open-fruit-rt[]
-
-ifndef::workshop[]
 --
-endif::[]
 ====
 
 The `fruit-events-display` UI will be empty as shown below:
@@ -535,66 +420,25 @@ spec:
 
 You can deploy the Knative Event Trigger using the following command:
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#kamel-cbr-deploy-trigger]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 kubectl apply -n {tutorial-namespace} -f eip/sugary-fruits.yaml
 ----
-copyToClipboard::kamel-cbr-deploy-trigger[]
---
-oc::
-+
---
-endif::[]
-[#kamel-cbr-deploy-trigger-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-oc apply -n {tutorial-namespace} -f eip/sugary-fruits.yaml
-----
-copyToClipboard::kamel-cbr-deploy-trigger-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 Let us check the status of the Trigger using the command `kubectl -n {tutorial-namespace} get triggers` which should return one trigger called `sugary-fruits` with ready state as shown below. 
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#kamel-cbr-list-triggers]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 kubectl -n {tutorial-namespace} get triggers
 ----
-copyToClipboard::kamel-cbr-list-triggers[]
---
-oc::
-+
---
-endif::[]
-[#kamel-cbr-list-triggers-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-oc -n {tutorial-namespace} get triggers
-----
-copyToClipboard::kamel-cbr-list-triggers-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
 
 As the trigger will dispatch its filtered event to `fruit-events-display` , the subscriber URI of the Trigger will be that of `fruit-events-display` service.
 
+[.console-output]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 NAME           READY BROKER    SUBSCRIBER_URI
@@ -609,11 +453,11 @@ Now that we have all the components for the <<cbr-app-overview>>, let us verify 
 To verify the data flow and processing call the `fruits-producer` service using the script `$TUTORIAL_HOME/bin/call.sh` with parameters `fruits-producer` and ''.
 
 [#kamel-cbr-e2e-run]
+[.console-input]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 $TUTORIAL_HOME/bin/call.sh fruits-producer ''
 ----
-copyToClipboard::kamel-cbr-e2e-run[]
 
 Assuming everything worked well, you should see the `low-sugar` fruits listed in the `fruits-event-display` as shown below:
 
@@ -623,12 +467,7 @@ image::cbr_app_ui_with_data.png[align="center"]
 [#kamel-cbr-cleanup]
 === Cleanup
 
-ifndef::workshop[]
-[tabs]
-====
-kubectl::
-+
---
+[.console-input]
 [#camelk-cbr-cleanup]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
@@ -636,21 +475,3 @@ kamel delete  -n {tutorial-namespace} fruit-producer
 kubectl delete  -n {tutorial-namespace} -f -f eip/fruits-processor.yaml
 kubectl delete -n {tutorial-namespace} -f $TUTORIAL_HOME/install/utils/fruit-events-display.yaml
 ----
-copyToClipboard::camelk-cbr-cleanup[]
---
-oc::
-+
---
-endif::[]
-[#camelk-cbr-cleanup-oc]
-[source,bash,subs="+quotes,+attributes,+macros"]
-----
-kamel delete  -n {tutorial-namespace} fruit-producer
-oc delete  -n {tutorial-namespace} -f -f eip/fruits-processor.yaml
-oc delete -n {tutorial-namespace} -f $TUTORIAL_HOME/install/utils/fruit-events-display.yaml
-----
-copyToClipboard::camelk-cbr-cleanup-oc[]
-ifndef::workshop[]
---
-endif::[]
-====
