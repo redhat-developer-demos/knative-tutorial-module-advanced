@@ -242,18 +242,18 @@ Wait for eventinghello to scale down to zero pods before moving on then push mor
 $TUTORIAL_HOME/bin/kafka-producer.sh
 ----
 
-And then enter the following JSON-formatted messages:
+And then enter the following messages:
 
 [.console-output]
-[source,json]
+[source,bash]
 ----
-{"hello":"world"}
+Hello World
 
-{"hola":"mundo"}
+Hola Mundo
 
-{"bonjour":"le monde"}
+Bonjour Le Monde
 
-{"hey": "duniya"}
+Namaste Duniya
 ----
 
 [NOTE]
@@ -280,12 +280,12 @@ ce-time=2020-01-01T01:16:12.886Z
 ce-type=dev.knative.kafka.event
 content-type=null
 content-length=17
-POST:{"hey": "duniya"}
+POST:Namaste Duniya
 ----
 
 [NOTE]
 ====
-The sample output has been modified for readability and formatting reasons. You can see the logging output of all your JSON-based event input in the terminal where you are watching the eventinghello logs.
+If the `eventinghello` sink was scaled down by Knative due to inactivity, you will see the service comeup to serve the request once the message is sent
 ====
 
 [#kn-kafka-src-cleanup]
