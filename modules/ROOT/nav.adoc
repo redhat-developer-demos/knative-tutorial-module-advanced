@@ -7,6 +7,7 @@
 *** xref:eventing-with-kafka.adoc#kn-eventing-kafka-source[Deploy KafkaSource]
 *** xref:eventing-with-kafka.adoc#kn-eventing-adv-default-knative-channel[Kafka Knative Channel]
 *** xref:eventing-with-kafka.adoc#kn-eventing-kafka-source-to-sink[Kafka Source to Sink]
+*** xref:eventing-with-kafka.adoc#kn-eventing-kafka-auto-scaling[Auto Scaling with Kafka]
 ** xref:eventing-with-kafka.adoc#kn-kafka-src-cleanup[Cleanup]
 *  EIP with Apache Camel-K
 ** xref:camel-k-cbr.adoc[Content Based Routing]
