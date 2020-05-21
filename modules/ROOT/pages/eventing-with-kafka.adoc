@@ -8,7 +8,7 @@ At the end of this chapter you will be able to:
 
 - Using KafkaSource with Knative Eventing
 - Source Kafka Events to Sink
-- Autocaling Knative Services with Apache Kafka Events
+- Autoscaling Knative Services with Apache Kafka Events
 
 [.console-input]
 [source,bash,subs="+quotes,attributes+,+macros"]
@@ -180,6 +180,39 @@ stern eventinghello -c user-container
 
 The initial deployment of `eventinghello` will cause it to scale up to 1 pod.  It will be around until it hits its scale-down time limit.  Allow it to scale down to zero pods before continuing.
 
+Create `KafkaTopic` called `my-topic` as shown below:
+
+[source,yaml]
+----
+include::example$kafka-topic-my-topic.yaml[]
+----
+
+[.console-input]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+kubectl apply -n kafka \
+  -f $TUTORIAL_HOME/eventing/kafka-topic-my-topic.yaml
+----
+
+Check the created topics by:
+
+[.console-input]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+kubectl get -n kafka kafkatopics
+----
+
+The command should show an output like:
+
+[.console-output]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+NAME                                                          PARTITIONS   REPLICATION FACTOR
+consumer-offsets---84e7a678d08f4bd226872e5cdd4eb527fadc1c6a   50           1
+*my-topic                                                      _10_           1*
+----
+
+
 Create a `KafkaSource` for `my-topic` by connecting your Kafka topic `my-topic` to eventinghello:
 
 [source,yaml]
@@ -242,18 +275,18 @@ Wait for eventinghello to scale down to zero pods before moving on then push mor
 $TUTORIAL_HOME/bin/kafka-producer.sh
 ----
 
-And then enter the following JSON-formatted messages:
+And then enter the following messages:
 
 [.console-output]
-[source,json]
+[source,bash]
 ----
-{"hello":"world"}
+Hello World
 
-{"hola":"mundo"}
+Hola Mundo
 
-{"bonjour":"le monde"}
+Bonjour Le Monde
 
-{"hey": "duniya"}
+Namaste Duniya
 ----
 
 [NOTE]
@@ -280,13 +313,82 @@ ce-time=2020-01-01T01:16:12.886Z
 ce-type=dev.knative.kafka.event
 content-type=null
 content-length=17
-POST:{"hey": "duniya"}
+POST:Namaste Duniya
 ----
 
 [NOTE]
 ====
-The sample output has been modified for readability and formatting reasons. You can see the logging output of all your JSON-based event input in the terminal where you are watching the eventinghello logs.
+If the `eventinghello` sink was scaled down by Knative due to inactivity, you will see the service comeup to serve the request once the message is sent
 ====
+
+[[kn-eventing-kafka-auto-scaling]]
+== Auto Scaling with Apache Kafka
+
+[IMPORTANT]
+====
+Allow all the `eventinghello` sink pods to scale down to zero.
+====
+
+Open a new terminal and watch the pods of `{tutorial-namespace}` namespace:
+
+[.console-input]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+watch kubectl get pods -n {tutorial-namespace} 
+----
+
+We will use a utility pod called `kafka-spammer` to send a bunch of messages to KafkaTopic `my-topic`, which in turn will trigger the Knative sink service `eventinghello` to scale up to handle the KakaTopic message events.
+
+Deploy `kafka-spammer` application using the command:
+
+[.console-input]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+kubectl -n kafka run kafka-spammer \
+--image=quay.io/rhdevelopers/kafkaspammer:1.0.2
+----
+
+Wait for the `kafka-spammer` pod to be up and running, you can watch `kafka` namespace for the pod:
+
+[.console-input]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+watch kubectl -n kafka get pods
+----
+
+Once the `kafka-spammer` is up and running, open a new terminal and exec into the pod by running:
+
+[.console-input]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+KAFKA_SPAMMER_POD=$(kubectl -n kafka get pod -l "run=kafka-spammer" \
+-o jsonpath={.items[0].metadata.name})
+kubectl -n kafka exec -it $KAFKA_SPAMMER_POD -- /bin/sh
+----
+
+Once you are in the shell of the `kafka-spammer` pod run the following command:
+
+[.console-input]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+curl localhost:8080/3
+----
+
+The command should now send three concurrent messages to KafkaTopic `my-topic`. As the`eventinghello` sink pods were scaled down to zero, you should see three or more `eventinghello` sink pods being scaled to serve the request.
+
+
+[.console-output]
+[source,bash,subs="+quotes,+attributes,+macros"]
+----
+NAME                                                              READY   STATUS    RESTARTS   AGE
+camel-k-operator-65db5d46bb-llc6g                                 1/1     Running   0          20h
+*eventinghello-v1-deployment-57c686cc96-6k9r2                      2/2     Running   0          15s*
+*eventinghello-v1-deployment-57c686cc96-jcv8b                      2/2     Running   0          13s*
+*eventinghello-v1-deployment-57c686cc96-lh8xr                      2/2     Running   0          15s*
+*eventinghello-v1-deployment-57c686cc96-n2slh                      2/2     Running   0          16s*
+kafkasource-mykafka-source-a29a50ca-4d76-4e65-8b96-1507372bfphb   1/1     Running   0          119s
+----
+
 
 [#kn-kafka-src-cleanup]
 === Cleanup
@@ -295,6 +397,7 @@ The sample output has been modified for readability and formatting reasons. You 
 [#kn-eventing-kafka-src-cleanup]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
+kubectl delete -n kafka pod kafka-spammer
 kubectl delete -n {tutorial-namespace}  -f mykafka-source.yaml
 kubectl delete -n {tutorial-namespace}  -f eventing-hello-sink.yaml
 kubectl delete -n kafka -f kafka-topic-my-topic.yaml
