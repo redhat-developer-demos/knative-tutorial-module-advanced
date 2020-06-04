@@ -106,7 +106,7 @@ When listing the resources of `knative-eventing` , you should see an extra deplo
 [.console-input]
 [source,bash,subs="+quotes,attributes+,+macros"]
 ----
-kubectl get -n {tutorial-namespace} pods
+kubectl get -n knative-eventing pods
 ----
 
 [.console-output]

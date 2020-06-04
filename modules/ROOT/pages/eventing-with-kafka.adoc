@@ -191,7 +191,7 @@ include::example$kafka-topic-my-topic.yaml[]
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 kubectl apply -n kafka \
-  -f $TUTORIAL_HOME/eventing/kafka-topic-my-topic.yaml
+  -f kafka-topic-my-topic.yaml
 ----
 
 Check the created topics by:
@@ -217,7 +217,7 @@ Create a `KafkaSource` for `my-topic` by connecting your Kafka topic `my-topic` 
 
 [source,yaml]
 ----
-apiVersion: sources.eventing.knative.dev/v1alpha1
+apiVersion: sources.knative.dev/v1alpha1
 kind: KafkaSource
 metadata:
   name: mykafka-source
@@ -362,7 +362,7 @@ Once the `kafka-spammer` is up and running, open a new terminal and exec into th
 [source,bash,subs="+quotes,+attributes,+macros"]
 ----
 KAFKA_SPAMMER_POD=$(kubectl -n kafka get pod -l "run=kafka-spammer" \
--o jsonpath={.items[0].metadata.name})
+-o jsonpath='{.items[0].metadata.name}')
 kubectl -n kafka exec -it $KAFKA_SPAMMER_POD -- /bin/sh
 ----
 
